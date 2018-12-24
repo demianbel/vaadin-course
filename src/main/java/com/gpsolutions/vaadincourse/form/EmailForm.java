@@ -41,11 +41,12 @@ public class EmailForm extends Panel {
         });
 
         final Button discard = new Button("cancel");
-        final HorizontalLayout buttonLayout = new HorizontalLayout(save, discard);
-        save.addClickListener(click -> {
+        discard.addClickListener(click -> {
             emailFieldGroup.discard();
             onDiscard.run();
         });
+
+        final HorizontalLayout buttonLayout = new HorizontalLayout(save, discard);
 
         this.setContent(new FormLayout(nameTextField, messageTextArea, recipientsField, dateField, buttonLayout));
 
