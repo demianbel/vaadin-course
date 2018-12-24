@@ -76,11 +76,11 @@ public class VaadinUI extends UI {
 
         addButton.addClickListener(event -> {
             final Email newEmail = new Email();
-            openWindowForEmail(emailGrid, newEmail, Window::close, window -> {
+            openWindowForEmail(emailGrid, newEmail, window -> {
                 emails.add(newEmail);
                 emailGrid.getContainerDataSource().addItem(newEmail);
                 window.close();
-            });
+            }, Window::close);
 
         });
 
