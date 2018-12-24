@@ -1,4 +1,4 @@
-package com.gpsolutions.vaadincourse.ui;
+package com.gpsolutions.vaadincourse.dto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

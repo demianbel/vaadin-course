@@ -1,4 +1,4 @@
-package com.gpsolutions.vaadincourse.ui;
+package com.gpsolutions.vaadincourse.field;
 
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.event.FieldEvents;

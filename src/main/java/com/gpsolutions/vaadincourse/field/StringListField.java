@@ -1,4 +1,4 @@
-package com.gpsolutions.vaadincourse.ui;
+package com.gpsolutions.vaadincourse.field;
 
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.AbstractField;
@@ -11,6 +11,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StringListField extends CustomField<List<String>> {
@@ -18,42 +19,59 @@ public class StringListField extends CustomField<List<String>> {
     private VerticalLayout mainLayout;
     private List<TextField> textFields = new ArrayList<>();
 
+    public StringListField() {
+        super();
+    }
+
+    public StringListField(final String caption) {
+        this();
+        this.setCaption(caption);
+    }
+
     @Override protected Component initContent() {
         final VerticalLayout parent = new VerticalLayout();
         parent.addComponent(getMainLayout());
+        getValue().forEach(this::addRecipientToForm);
         final Button addRecipient = new Button("add recipient");
         addRecipient.addClickListener(event -> {
             addRecipientToForm("");
-            fireValueChange(true);
+            super.setValue(textFields.stream().map(AbstractField::getValue).collect(Collectors.toList()));
         });
         parent.addComponent(addRecipient);
         return parent;
     }
 
+    @SuppressWarnings("unchecked")
     @Override public Class<? extends List<String>> getType() {
-        try {
-            return (Class<? extends List<String>>) StringListField.class.getMethod("getType").getReturnType();
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException("omg");
-        }
+
+        return (Class<List<String>>) ((List<String>) new ArrayList<String>()).getClass();
     }
 
     @Override public List<String> getValue() {
-        return textFields.stream().map(AbstractField::getValue).collect(Collectors.toList());
+        return super.getValue();
     }
 
     @Override public void setValue(final List<String> newFieldValue)
             throws ReadOnlyException, Converter.ConversionException {
         getMainLayout().removeAllComponents();
-        newFieldValue.forEach(this::addRecipientToForm);
-        super.setValue(new ArrayList<>(newFieldValue));
+        if (newFieldValue != null) {
+            newFieldValue.forEach(this::addRecipientToForm);
+        }
+        super.setValue(new ArrayList<>(Optional.ofNullable(newFieldValue).orElse(new ArrayList<>())));
     }
 
     private void addRecipientToForm(final String recipient) {
         final HorizontalLayout layout = new HorizontalLayout();
         final TextField textField = new TextField();
         textField.setValue(recipient);
-        textField.addValueChangeListener(event -> fireValueChange(true));
+        textField.addTextChangeListener(
+                event -> super.setValue(textFields.stream().map(field -> {
+                    if (field != textField) {
+                        return field.getValue();
+                    } else {
+                        return event.getText();
+                    }
+                }).collect(Collectors.toList())));
         textFields.add(textField);
         final Button remove = new Button("Remove");
         remove.addClickListener(event -> {
@@ -65,7 +83,7 @@ public class StringListField extends CustomField<List<String>> {
         getMainLayout().addComponent(layout);
     }
 
-    public VerticalLayout getMainLayout() {
+    private VerticalLayout getMainLayout() {
         if (mainLayout == null) {
             mainLayout = new VerticalLayout();
         }
