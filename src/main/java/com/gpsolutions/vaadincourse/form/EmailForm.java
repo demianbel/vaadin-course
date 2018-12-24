@@ -25,17 +25,16 @@ public class EmailForm extends Panel {
     @PropertyId("date")
     private final LocalDateField dateField = new LocalDateField("Date");
 
-    public EmailForm(final Email email, final Runnable onSaveOrDiscard) {
+    public EmailForm(final Email email, final Runnable onSave, final Runnable onDiscard) {
         final BeanFieldGroup<Email> emailFieldGroup = new BeanFieldGroup<>(Email.class);
         emailFieldGroup.setItemDataSource(email);
         emailFieldGroup.bindMemberFields(this);
-//        emailFieldGroup.bind(dateField, "date");
 
         final Button save = new Button("save");
         save.addClickListener(click -> {
             try {
                 emailFieldGroup.commit();
-                onSaveOrDiscard.run();
+                onSave.run();
             } catch (FieldGroup.CommitException e) {
                 Notification.show("Commit failed", Notification.Type.ERROR_MESSAGE);
             }
@@ -45,7 +44,7 @@ public class EmailForm extends Panel {
         final HorizontalLayout buttonLayout = new HorizontalLayout(save, discard);
         save.addClickListener(click -> {
             emailFieldGroup.discard();
-            onSaveOrDiscard.run();
+            onDiscard.run();
         });
 
         this.setContent(new FormLayout(nameTextField, messageTextArea, recipientsField, dateField, buttonLayout));

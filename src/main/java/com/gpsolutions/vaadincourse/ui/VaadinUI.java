@@ -8,7 +8,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Notification;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 @SpringUI(path = "vaadin")
 @Theme("valo")
@@ -49,6 +50,7 @@ public class VaadinUI extends UI {
 
         final Button removeButton = new Button("Remove");
         final Button editButton = new Button("Edit");
+        final Button addButton = new Button("Add");
         removeButton.setEnabled(false);
         editButton.setEnabled(false);
         emailGrid.addSelectionListener(selectionEvent -> {
@@ -68,17 +70,37 @@ public class VaadinUI extends UI {
             final Collection<Object> selectedRows = emailGrid.getSelectedRows();
             if (!selectedRows.isEmpty()) {
                 final Object next = selectedRows.iterator().next();
-                final Window editWindow = new Window();
-                editWindow.setModal(true);
-                editWindow.setContent(new EmailForm((Email) next, editWindow::close));
-                editWindow.addCloseListener(e -> emailGrid.refreshAllRows());
-                this.addWindow(editWindow);
+                openWindowForEmail(emailGrid, (Email) next, Window::close, Window::close);
             }
         });
-        layout.addComponents(emailGrid, removeButton, editButton);
+
+        addButton.addClickListener(event -> {
+            final Email newEmail = new Email();
+            openWindowForEmail(emailGrid, newEmail, Window::close, window -> {
+                emails.add(newEmail);
+                emailGrid.getContainerDataSource().addItem(newEmail);
+                window.close();
+            });
+
+        });
+
+        final HorizontalLayout buttonLayout = new HorizontalLayout(addButton, editButton, removeButton);
+
+        layout.addComponents(emailGrid, buttonLayout);
 
         this.setContent(layout);
         this.setSizeFull();
+    }
+
+    private void openWindowForEmail(final Grid emailGrid,
+                                    final Email email,
+                                    final Consumer<Window> onClose, final Consumer<Window> onDiscard) {
+        final Window editWindow = new Window();
+        editWindow.setModal(true);
+        editWindow
+                .setContent(new EmailForm(email, () -> onClose.accept(editWindow), () -> onDiscard.accept(editWindow)));
+        editWindow.addCloseListener(e -> emailGrid.refreshAllRows());
+        this.addWindow(editWindow);
     }
 
     private Email createEmail(final String name,
