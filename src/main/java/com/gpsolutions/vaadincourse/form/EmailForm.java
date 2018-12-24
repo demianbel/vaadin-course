@@ -26,6 +26,8 @@ public class EmailForm extends Panel {
     private final LocalDateField dateField = new LocalDateField("Date");
 
     public EmailForm(final Email email, final Runnable onSave, final Runnable onDiscard) {
+        nameTextField.setNullRepresentation("");
+        messageTextArea.setNullRepresentation("");
         final BeanFieldGroup<Email> emailFieldGroup = new BeanFieldGroup<>(Email.class);
         emailFieldGroup.setItemDataSource(email);
         emailFieldGroup.bindMemberFields(this);
@@ -49,6 +51,7 @@ public class EmailForm extends Panel {
         final HorizontalLayout buttonLayout = new HorizontalLayout(save, discard);
 
         this.setContent(new FormLayout(nameTextField, messageTextArea, recipientsField, dateField, buttonLayout));
+        this.addStyleName("email-form");
 
     }
 }

@@ -23,3 +23,7 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+/src/main/webapp/VAADIN/themes/mytheme/styles.css
+src/main/resources/static/
+src/main/resources/templates/
+src/main/webapp/VAADIN/themes/mytheme/styles.css

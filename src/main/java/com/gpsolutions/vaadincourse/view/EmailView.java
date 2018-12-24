@@ -89,6 +89,8 @@ public class EmailView extends CustomComponent implements View {
                                     final Consumer<Window> onClose, final Consumer<Window> onDiscard) {
         final Window editWindow = new Window();
         editWindow.setModal(true);
+        editWindow.setWidth(20, Unit.PERCENTAGE);
+        editWindow.center();
         editWindow
                 .setContent(new EmailForm(email, () -> onClose.accept(editWindow), () -> onDiscard.accept(editWindow)));
         editWindow.addCloseListener(e -> emailGrid.refreshAllRows());

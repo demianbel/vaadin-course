@@ -10,7 +10,7 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
 @SpringUI(path = "vaadin")
-@Theme("valo")
+@Theme("mytheme")
 public class VaadinUI extends UI {
 
     private final SpringViewProvider viewProvider;
