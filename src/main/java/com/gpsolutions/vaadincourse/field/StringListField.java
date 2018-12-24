@@ -31,10 +31,10 @@ public class StringListField extends CustomField<List<String>> {
     @Override protected Component initContent() {
         final VerticalLayout parent = new VerticalLayout();
         parent.addComponent(getMainLayout());
-        getValue().forEach(this::addRecipientToForm);
+        getValue().forEach(this::addStringToForm);
         final Button addRecipient = new Button("add recipient");
         addRecipient.addClickListener(event -> {
-            addRecipientToForm("");
+            addStringToForm("");
             super.setValue(textFields.stream().map(AbstractField::getValue).collect(Collectors.toList()));
         });
         parent.addComponent(addRecipient);
@@ -55,15 +55,15 @@ public class StringListField extends CustomField<List<String>> {
             throws ReadOnlyException, Converter.ConversionException {
         getMainLayout().removeAllComponents();
         if (newFieldValue != null) {
-            newFieldValue.forEach(this::addRecipientToForm);
+            newFieldValue.forEach(this::addStringToForm);
         }
         super.setValue(new ArrayList<>(Optional.ofNullable(newFieldValue).orElse(new ArrayList<>())));
     }
 
-    private void addRecipientToForm(final String recipient) {
+    private void addStringToForm(final String stringToAdd) {
         final HorizontalLayout layout = new HorizontalLayout();
         final TextField textField = new TextField();
-        textField.setValue(recipient);
+        textField.setValue(stringToAdd);
         textField.addTextChangeListener(
                 event -> super.setValue(textFields.stream().map(field -> {
                     if (field != textField) {
