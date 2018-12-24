@@ -21,7 +21,7 @@ public class EmailForm extends Panel {
     @PropertyId("message")
     private final TextArea messageTextArea = new TextArea("Message");
     @PropertyId("recipients")
-    private final StringListField recipientsField = new StringListField("Recipients");
+    private final StringListField recipientsField = new StringListField("Recipients", "Add recipient");
     @PropertyId("date")
     private final LocalDateField dateField = new LocalDateField("Date");
 

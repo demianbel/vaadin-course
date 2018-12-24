@@ -18,21 +18,23 @@ public class StringListField extends CustomField<List<String>> {
 
     private VerticalLayout mainLayout;
     private List<TextField> textFields = new ArrayList<>();
+    private String addButtonCaption;
 
     public StringListField() {
         super();
     }
 
-    public StringListField(final String caption) {
+    public StringListField(final String caption, final String addButtonCaption) {
         this();
         this.setCaption(caption);
+        this.addButtonCaption = addButtonCaption;
     }
 
     @Override protected Component initContent() {
         final VerticalLayout parent = new VerticalLayout();
         parent.addComponent(getMainLayout());
         getValue().forEach(this::addStringToForm);
-        final Button addRecipient = new Button("add recipient");
+        final Button addRecipient = new Button(addButtonCaption);
         addRecipient.addClickListener(event -> {
             addStringToForm("");
             super.setValue(textFields.stream().map(AbstractField::getValue).collect(Collectors.toList()));
