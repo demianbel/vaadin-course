@@ -1,6 +1,6 @@
 package com.gpsolutions.vaadincourse.form;
 
-import com.gpsolutions.vaadincourse.dto.Email;
+import com.gpsolutions.vaadincourse.dbo.Email;
 import com.gpsolutions.vaadincourse.field.LocalDateField;
 import com.gpsolutions.vaadincourse.field.StringListField;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;

@@ -1,9 +1,10 @@
 package com.gpsolutions.vaadincourse.view;
 
-import com.gpsolutions.vaadincourse.dto.Email;
+import com.gpsolutions.vaadincourse.dbo.Email;
 import com.gpsolutions.vaadincourse.form.EmailForm;
-import com.gpsolutions.vaadincourse.service.EmailService;
-import com.vaadin.data.util.BeanItemContainer;
+import com.gpsolutions.vaadincourse.repository.EmailRepository;
+import com.vaadin.addon.jpacontainer.JPAContainer;
+import com.vaadin.addon.jpacontainer.JPAContainerFactory;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
@@ -15,8 +16,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import javax.persistence.EntityManagerFactory;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -25,15 +26,13 @@ import java.util.function.Consumer;
 public class EmailView extends CustomComponent implements View {
     public final static String NAME = "email";
 
-
-    public EmailView(final EmailService emailService) {
+    public EmailView(final EmailRepository emailRepository, final EntityManagerFactory entityManagerFactory) {
+        final JPAContainer<Email> container =
+                JPAContainerFactory.make(Email.class, entityManagerFactory.createEntityManager());
         final Button closeButton = new Button("Close");
         closeButton.addClickListener(event -> getUI().getNavigator().navigateTo(MainView.NAME));
-        final List<Email> emails = emailService.getAllEmails();
 
         final VerticalLayout layout = new VerticalLayout();
-        final BeanItemContainer<Email> container =
-                new BeanItemContainer<>(Email.class, emails);
         final Grid emailGrid = new Grid(container);
         emailGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         emailGrid.setSizeFull();
@@ -50,7 +49,6 @@ public class EmailView extends CustomComponent implements View {
         });
         removeButton.addClickListener(event -> {
             final Collection<Object> selectedRows = emailGrid.getSelectedRows();
-            emails.removeAll(selectedRows);
             selectedRows.forEach(
                     emailGrid.getContainerDataSource()::removeItem);
             emailGrid.refreshAllRows();
@@ -59,16 +57,20 @@ public class EmailView extends CustomComponent implements View {
         editButton.addClickListener(event -> {
             final Collection<Object> selectedRows = emailGrid.getSelectedRows();
             if (!selectedRows.isEmpty()) {
-                final Object next = selectedRows.iterator().next();
-                openWindowForEmail(emailGrid, (Email) next, Window::close, Window::close);
+                final Long next = (Long) selectedRows.iterator().next();
+                final Email email = emailRepository.findById(next)
+                        .orElseThrow(RuntimeException::new);
+                openWindowForEmail(container, email, components -> {
+                    emailRepository.save(email);
+                    components.close();
+                }, Window::close);
             }
         });
 
         addButton.addClickListener(event -> {
             final Email newEmail = new Email();
-            openWindowForEmail(emailGrid, newEmail, window -> {
-                emails.add(newEmail);
-                emailGrid.getContainerDataSource().addItem(newEmail);
+            openWindowForEmail(container, newEmail, window -> {
+                emailRepository.save(newEmail);
                 window.close();
             }, Window::close);
 
@@ -84,7 +86,7 @@ public class EmailView extends CustomComponent implements View {
     @Override public void enter(final ViewChangeListener.ViewChangeEvent viewChangeEvent) {
     }
 
-    private void openWindowForEmail(final Grid emailGrid,
+    private void openWindowForEmail(final JPAContainer<Email> container,
                                     final Email email,
                                     final Consumer<Window> onClose, final Consumer<Window> onDiscard) {
         final Window editWindow = new Window();
@@ -93,7 +95,7 @@ public class EmailView extends CustomComponent implements View {
         editWindow.center();
         editWindow
                 .setContent(new EmailForm(email, () -> onClose.accept(editWindow), () -> onDiscard.accept(editWindow)));
-        editWindow.addCloseListener(e -> emailGrid.refreshAllRows());
+        editWindow.addCloseListener(e -> container.refresh());
         UI.getCurrent().addWindow(editWindow);
     }
 }

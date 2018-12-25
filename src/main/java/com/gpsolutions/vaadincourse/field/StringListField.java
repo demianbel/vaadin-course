@@ -10,6 +10,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,8 +46,8 @@ public class StringListField extends CustomField<List<String>> {
 
     @SuppressWarnings("unchecked")
     @Override public Class<? extends List<String>> getType() {
-
-        return (Class<List<String>>) ((List<String>) new ArrayList<String>()).getClass();
+        return (Class<List<String>>) Arrays.stream(ArrayList.class.getInterfaces())
+                .filter(a -> a.isAssignableFrom(List.class)).findAny().orElseThrow(RuntimeException::new);
     }
 
     @Override public List<String> getValue() {
