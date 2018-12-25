@@ -5,6 +5,7 @@ import com.gpsolutions.vaadincourse.form.EmailForm;
 import com.gpsolutions.vaadincourse.repository.EmailRepository;
 import com.vaadin.addon.jpacontainer.JPAContainer;
 import com.vaadin.addon.jpacontainer.JPAContainerFactory;
+import com.vaadin.data.util.filter.Like;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
@@ -12,6 +13,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -34,6 +36,17 @@ public class EmailView extends CustomComponent implements View {
 
         final VerticalLayout layout = new VerticalLayout();
         final Grid emailGrid = new Grid(container);
+
+        final Grid.HeaderRow headerRow = emailGrid.addHeaderRowAt(0);
+        final Grid.HeaderCell messageHeader = headerRow.getCell("message");
+        final TextField messageFilter = new TextField();
+        messageFilter.addTextChangeListener(event -> {
+            final String newFilterValue = event.getText();
+            container.removeAllContainerFilters();
+            container.addContainerFilter(new Like("message", "%" + newFilterValue + "%"));
+        });
+        messageHeader.setComponent(messageFilter);
+
         emailGrid.setSelectionMode(Grid.SelectionMode.MULTI);
         emailGrid.setSizeFull();
 
@@ -70,7 +83,7 @@ public class EmailView extends CustomComponent implements View {
         addButton.addClickListener(event -> {
             final Email newEmail = new Email();
             openWindowForEmail(container, newEmail, window -> {
-                emailRepository.save(newEmail);
+                container.addEntity(newEmail);
                 window.close();
             }, Window::close);
 
