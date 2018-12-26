@@ -2,6 +2,7 @@ package com.gpsolutions.vaadincourse.ui;
 
 import com.gpsolutions.vaadincourse.view.ErrorView;
 import com.gpsolutions.vaadincourse.view.MainView;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
@@ -9,6 +10,7 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
+@Push
 @SpringUI(path = "vaadin")
 @Theme("mytheme")
 public class VaadinUI extends UI {
