@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +30,13 @@ public class Email {
     private long optlock;
 
     @Column
+    @Size(min = 1, max = 10)
+    @NotNull
     private String name;
 
     @Column
+    @Size(min = 1, max = 30)
+    @NotNull
     private String message;
 
     @ElementCollection(fetch = FetchType.EAGER)

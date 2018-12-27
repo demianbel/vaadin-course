@@ -3,6 +3,7 @@ package com.gpsolutions.vaadincourse.form;
 import com.gpsolutions.vaadincourse.dbo.Email;
 import com.gpsolutions.vaadincourse.field.LocalDateField;
 import com.gpsolutions.vaadincourse.field.StringListField;
+import com.vaadin.data.Validator;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
@@ -13,6 +14,9 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class EmailForm extends Panel {
 
@@ -32,13 +36,17 @@ public class EmailForm extends Panel {
         emailFieldGroup.setItemDataSource(email);
         emailFieldGroup.bindMemberFields(this);
 
+        dateField.addValidator(this::validateDate);
+
+        recipientsField.addValidator(this::validateRecipientsValue);
+
         final Button save = new Button("save");
         save.addClickListener(click -> {
             try {
                 emailFieldGroup.commit();
                 onSave.run();
             } catch (FieldGroup.CommitException e) {
-                Notification.show("Commit failed", Notification.Type.ERROR_MESSAGE);
+                Notification.show("Form isn't valid", Notification.Type.WARNING_MESSAGE);
             }
         });
 
@@ -54,4 +62,27 @@ public class EmailForm extends Panel {
         this.addStyleName("email-form");
 
     }
+
+    private void validateDate(final Object value) {
+        if (value == null) {
+            throw new Validator.InvalidValueException("date is empty");
+        }
+        if (((LocalDate) value).isBefore(LocalDate.now())) {
+            throw new Validator.InvalidValueException("date is before today");
+        }
+    }
+
+    private void validateRecipientsValue(final Object value) {
+        final List<String> castedValue = (List<String>) value;
+        if (castedValue == null || castedValue.isEmpty()) {
+            throw new Validator.InvalidValueException("recipients is empty");
+        }
+        if (castedValue.stream().anyMatch(recipient -> recipient == null || recipient.isEmpty())) {
+            throw new Validator.InvalidValueException("some recipient value is null empty");
+        }
+        if (castedValue.size() > 2) {
+            throw new Validator.InvalidValueException("recipients number should be less than 2");
+        }
+    }
+
 }
