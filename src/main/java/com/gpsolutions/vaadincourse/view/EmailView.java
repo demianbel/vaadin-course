@@ -151,4 +151,5 @@ public class EmailView extends CustomComponent implements View, Consumer<Email> 
     @Override public void accept(final Email email) {
         getUI().access(container::refresh);
     }
+
 }

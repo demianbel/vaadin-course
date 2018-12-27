@@ -15,6 +15,8 @@ public class MainView extends CustomComponent implements View {
         final MenuBar menuBar = new MenuBar();
         menuBar.addItem("Email", (MenuBar.Command) selectedItem -> getUI().getNavigator().navigateTo(EmailView.NAME));
         menuBar.addItem("Chat", (MenuBar.Command) selectedItem -> getUI().getNavigator().navigateTo(ChatView.NAME));
+        menuBar.addItem("Access denied",
+                        (MenuBar.Command) selectedItem -> getUI().getNavigator().navigateTo(NotAvailableView.NAME));
         menuBar.addItem("Error",
                         (MenuBar.Command) selectedItem -> getUI().getNavigator().navigateTo(EmailView.NAME + "error"));
         this.setCompositionRoot(menuBar);
